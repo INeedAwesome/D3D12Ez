@@ -23,10 +23,10 @@ public:
 
 private:
 	DXDebugLayer() = default;
-
+#ifdef EZ_DEBUG
 	ComPointer<ID3D12Debug6> m_d3d12Debug;
 	ComPointer<IDXGIDebug1> m_dxgiDebug;
-
+#endif //EZ_DEBUG
 
 };
 

@@ -2,7 +2,7 @@
 
 bool DXDebugLayer::Init()
 {
-#ifdef _DEBUG
+#ifdef EZ_DEBUG
 	// Init D3D12 Debug Layer
 	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&m_d3d12Debug))))
 	{
@@ -16,13 +16,13 @@ bool DXDebugLayer::Init()
 		}
 	}
 
-#endif // _DEBUG
+#endif // EZ_DEBUG
 	return false;
 }
 
 void DXDebugLayer::Shutdown()
 {
-#ifdef _DEBUG
+#ifdef EZ_DEBUG
 	if (m_dxgiDebug)
 	{
 		OutputDebugString(L"DXGI Reports Living Device Objects: \n");
@@ -31,5 +31,5 @@ void DXDebugLayer::Shutdown()
 
 	m_dxgiDebug.Release();
 	m_d3d12Debug.Release();
-#endif // _DEBUG
+#endif // EZ_DEBUG
 }
