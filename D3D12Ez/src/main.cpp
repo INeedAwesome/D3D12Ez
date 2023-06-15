@@ -8,7 +8,7 @@
 #include "D3D/DXContext.h"
 #include "Debug/Timer.h"
 
-int main ()
+int main(int argc, char* argv[])
 {
 	Timer timer("DirectX & Window Init");
 
@@ -37,8 +37,12 @@ int main ()
 		DXContext::Get().ExecuteCommandList();
 
 		// presenting it to the screen
+		DXWindow::Get().Present();
 
 	}
+
+	//flushing
+	DXContext::Get().Flush(DXWindow::GetFrameCount());
 
 	DXWindow::Get().Shutdown();
 	DXContext::Get().Shutdown();

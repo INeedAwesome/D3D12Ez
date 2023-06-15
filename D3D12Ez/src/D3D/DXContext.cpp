@@ -43,8 +43,10 @@ void DXContext::Shutdown()
 	if (m_cmdList) m_cmdList.Release();
 	if (m_fenceEvent) CloseHandle(m_fenceEvent);
 	
+	m_fence.Release();
 	m_cmdQueue.Release();
 	m_device.Release(); 
+	m_dxgiFactory.Release(); 
 }
 
 void DXContext::SignalAndWait()

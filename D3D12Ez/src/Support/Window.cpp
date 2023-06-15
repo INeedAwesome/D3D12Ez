@@ -28,7 +28,7 @@ bool DXWindow::Init()
 	monitorInfo.cbSize = sizeof(monitorInfo);
 	GetMonitorInfoW(monitor, &monitorInfo);
 	
-	m_window = CreateWindowExW(
+	m_hwnd = CreateWindowExW(
 		WS_EX_OVERLAPPEDWINDOW | WS_EX_APPWINDOW, 
 		(LPCWSTR)m_windowClass, 
 		L"D3D12Ez", 
@@ -42,9 +42,37 @@ bool DXWindow::Init()
 		nullptr
 	);
 
-	if (!m_window)
+	if (!m_hwnd)
 		return false;
-	
+
+	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
+	DXGI_SWAP_CHAIN_FULLSCREEN_DESC swapChainFullscreenDesc{};
+	ComPointer<IDXGISwapChain1> sc1;
+	{
+		swapChainDesc.Width = 1920;
+		swapChainDesc.Height = 1080;
+		swapChainDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+		swapChainDesc.Stereo = false;
+		swapChainDesc.SampleDesc.Count = 1;
+		swapChainDesc.SampleDesc.Quality = 0; // MMAA
+		swapChainDesc.BufferUsage = DXGI_USAGE_BACK_BUFFER | DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		swapChainDesc.BufferCount = GetFrameCount();
+		swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
+		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+		swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
+		swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+	}
+	{
+		swapChainFullscreenDesc.RefreshRate;
+		swapChainFullscreenDesc.ScanlineOrdering;
+		swapChainFullscreenDesc.Scaling;
+		swapChainFullscreenDesc.Windowed = true;
+	}
+
+	auto& factory = DXContext::Get().GetFactory();
+	factory->CreateSwapChainForHwnd(DXContext::Get().GetCommandQueue(), m_hwnd, &swapChainDesc, &swapChainFullscreenDesc, nullptr, &sc1);
+	if (!sc1.QueryInterface(m_swapChain))
+		return false;
 
 	return true;
 
@@ -52,9 +80,14 @@ bool DXWindow::Init()
 
 void DXWindow::Shutdown()
 {
-	if (m_window)
+	if (m_swapChain)
 	{
-		DestroyWindow(m_window);
+		m_swapChain.Release();
+	}
+
+	if (m_hwnd)
+	{
+		DestroyWindow(m_hwnd);
 	}
 
 	if (m_windowClass)
@@ -67,11 +100,16 @@ void DXWindow::Shutdown()
 void DXWindow::Update()
 {
 	MSG msg;
-	while (PeekMessageW(&msg, m_window, 0, 0, PM_REMOVE))
+	while (PeekMessageW(&msg, m_hwnd, 0, 0, PM_REMOVE))
 	{
 		TranslateMessage(&msg);
 		DispatchMessageW(&msg);
 	}
+}
+
+void DXWindow::Present()
+{
+	m_swapChain->Present(1, 0);
 }
 
 LRESULT DXWindow::OnWindowMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
