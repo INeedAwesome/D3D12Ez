@@ -2,6 +2,8 @@
 
 bool DXContext::Init()
 {
+	if (FAILED(CreateDXGIFactory2(0, IID_PPV_ARGS(&m_dxgiFactory))))
+		return false;
 
 	if (FAILED(D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&m_device))))
 		return false;
@@ -47,12 +49,12 @@ void DXContext::Shutdown()
 
 void DXContext::SignalAndWait()
 {
-	m_cmdQueue->Signal(m_fence, m_fenceValue++);
+	m_cmdQueue->Signal(m_fence, ++m_fenceValue);
 
 	if (FAILED(m_fence->SetEventOnCompletion(m_fenceValue, m_fenceEvent))) 
 		std::exit(-1);
 
-	if (WaitForSingleObject(m_fenceEvent, 20000) != WAIT_OBJECT_0)
+	if ((WaitForSingleObject(m_fenceEvent, 20000) != WAIT_OBJECT_0))
 		std::exit(-2);
 }
 

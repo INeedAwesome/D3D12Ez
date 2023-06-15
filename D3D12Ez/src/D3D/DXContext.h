@@ -28,6 +28,8 @@ public:
 private:
 	DXContext() = default;
 
+	ComPointer<IDXGIFactory7> m_dxgiFactory;
+
 	ComPointer<ID3D12Device10> m_device;
 	ComPointer<ID3D12CommandQueue> m_cmdQueue;
 
