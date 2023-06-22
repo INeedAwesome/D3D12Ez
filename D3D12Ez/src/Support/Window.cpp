@@ -27,15 +27,18 @@ bool DXWindow::Init()
 	MONITORINFO monitorInfo = { 0 };
 	monitorInfo.cbSize = sizeof(monitorInfo);
 	GetMonitorInfoW(monitor, &monitorInfo);
+
+	m_width = monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left;
+	m_height = monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top;
 	
 	m_hwnd = CreateWindowExW(
 		WS_EX_OVERLAPPEDWINDOW | WS_EX_APPWINDOW, 
 		(LPCWSTR)m_windowClass, 
 		L"D3D12Ez", 
 		WS_OVERLAPPEDWINDOW | WS_VISIBLE, 
-		monitorInfo.rcWork.left + 100, 
-		monitorInfo.rcWork.top + 100,
-		1920, 1080, 
+		monitorInfo.rcWork.left, 
+		monitorInfo.rcWork.top,
+		m_width, m_height,
 		nullptr, 
 		nullptr, 
 		wcex.hInstance, 
@@ -49,8 +52,8 @@ bool DXWindow::Init()
 	DXGI_SWAP_CHAIN_FULLSCREEN_DESC swapChainFullscreenDesc{};
 	ComPointer<IDXGISwapChain1> sc1;
 	{
-		swapChainDesc.Width = 1920;
-		swapChainDesc.Height = 1080;
+		swapChainDesc.Width = m_width;
+		swapChainDesc.Height = m_height;
 		swapChainDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 		swapChainDesc.Stereo = false;
 		swapChainDesc.SampleDesc.Count = 1;
@@ -61,8 +64,7 @@ bool DXWindow::Init()
 		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 		swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
 		swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
-	}
-	{
+	
 		swapChainFullscreenDesc.RefreshRate;
 		swapChainFullscreenDesc.ScanlineOrdering;
 		swapChainFullscreenDesc.Scaling;
