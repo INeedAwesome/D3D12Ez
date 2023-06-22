@@ -3,20 +3,20 @@
 bool DXWindow::Init()
 {
 	WNDCLASSEXW wcex{};
-
-	wcex.cbSize = sizeof(wcex);
-	wcex.style = CS_OWNDC;
-	wcex.lpfnWndProc = &DXWindow::OnWindowMessage;
-	wcex.cbClsExtra = 0;
-	wcex.cbWndExtra = 0;
-	wcex.hInstance = GetModuleHandleW(nullptr);
-	wcex.hIcon = LoadIconW(nullptr, IDI_APPLICATION);
-	wcex.hCursor = LoadCursorW(nullptr, IDC_ARROW);
-	wcex.hbrBackground = nullptr;
-	wcex.lpszMenuName = nullptr;
-	wcex.lpszClassName = L"D3D12ExWndCls";
-	wcex.hIconSm = LoadIconW(nullptr, IDI_APPLICATION);
-
+	{
+		wcex.cbSize = sizeof(wcex);
+		wcex.style = CS_OWNDC;
+		wcex.lpfnWndProc = &DXWindow::OnWindowMessage;
+		wcex.cbClsExtra = 0;
+		wcex.cbWndExtra = 0;
+		wcex.hInstance = GetModuleHandleW(nullptr);
+		wcex.hIcon = LoadIconW(nullptr, IDI_APPLICATION);
+		wcex.hCursor = LoadCursorW(nullptr, IDC_ARROW);
+		wcex.hbrBackground = nullptr;
+		wcex.lpszMenuName = nullptr;
+		wcex.lpszClassName = L"D3D12ExWndCls";
+		wcex.hIconSm = LoadIconW(nullptr, IDI_APPLICATION);
+	}
 	m_windowClass = RegisterClassExW(&wcex);
 	if (m_windowClass == 0)
 		return false;
@@ -83,19 +83,13 @@ bool DXWindow::Init()
 void DXWindow::Shutdown()
 {
 	if (m_swapChain)
-	{
 		m_swapChain.Release();
-	}
 
 	if (m_hwnd)
-	{
 		DestroyWindow(m_hwnd);
-	}
 
 	if (m_windowClass)
-	{
 		UnregisterClassW((LPCWSTR)m_windowClass, GetModuleHandleW(nullptr));
-	}
 
 }
 
