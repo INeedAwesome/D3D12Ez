@@ -20,8 +20,10 @@ public:
 	void Shutdown();
 	void Update();
 	void Present();
+	void Resize();
 
 	inline bool ShouldClose() {	return m_shouldClose; }
+	inline bool ShouldResize() { return m_shouldResize; }
 	static constexpr size_t GetFrameCount() { return 2; }
 
 private:
@@ -32,6 +34,10 @@ private:
 	ATOM m_windowClass = 0;
 	HWND m_hwnd;
 	bool m_shouldClose = false;
+	
+	UINT m_width = 1920;
+	UINT m_height = 1080;
+	bool m_shouldResize = false;
 
 	ComPointer<IDXGISwapChain4> m_swapChain;
 };

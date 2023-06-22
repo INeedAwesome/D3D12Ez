@@ -112,14 +112,33 @@ void DXWindow::Present()
 	m_swapChain->Present(1, 0);
 }
 
+void DXWindow::Resize()
+{
+	RECT clientRect;
+	if (!GetClientRect(m_hwnd, &clientRect))
+		return;
+
+	m_width = clientRect.right - clientRect.left;
+	m_height = clientRect.bottom - clientRect.top;
+
+	m_swapChain->ResizeBuffers(GetFrameCount(), m_width, m_height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING);
+	m_shouldResize = false;
+
+}
+
 LRESULT DXWindow::OnWindowMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
-	case WM_CLOSE: {
-		Get().m_shouldClose = true;
-		return 0;
-	}
+		case WM_CLOSE: {
+			Get().m_shouldClose = true;
+			break;
+		}
+		case WM_SIZE: {
+			if (lParam && (HIWORD(lParam) != Get().m_height || LOWORD(lParam) != Get().m_width))
+				Get().m_shouldResize = true;
+			break;
+		}
 	default:
 		return DefWindowProc(hwnd, msg, wParam, lParam);
 	}

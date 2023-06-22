@@ -10,7 +10,7 @@
 
 int main(int argc, char* argv[])
 {
-	Timer timer("DirectX & Window Init");
+	Timer init("DirectX & Window Init");
 
 	std::cout << "Hello World!" << std::endl;
 	DXDebugLayer::Get().Init();
@@ -21,12 +21,17 @@ int main(int argc, char* argv[])
 	if (!DXWindow::Get().Init())
 		return 2;
 
-	timer.StopAndPrintTime();
+	init.StopAndPrintTime();
 
 	bool running = true;
 	while (!DXWindow::Get().ShouldClose())
 	{
 		DXWindow::Get().Update();
+		if (DXWindow::Get().ShouldResize())
+		{
+			DXContext::Get().Flush(DXWindow::GetFrameCount());
+			DXWindow::Get().Resize();
+		}
 
 		auto* commandList = DXContext::Get().InitCommandList();
 
@@ -40,6 +45,7 @@ int main(int argc, char* argv[])
 		DXWindow::Get().Present();
 
 	}
+
 
 	//flushing
 	DXContext::Get().Flush(DXWindow::GetFrameCount());
