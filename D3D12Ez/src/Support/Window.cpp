@@ -122,10 +122,76 @@ void DXWindow::Resize()
 
 }
 
+void DXWindow::SetFullscreen(bool enabled)
+{
+
+	HMONITOR monitor = MonitorFromWindow(m_hwnd, MONITOR_DEFAULTTONEAREST);
+	MONITORINFO monitorInfo = { 0 };
+	monitorInfo.cbSize = sizeof(monitorInfo);
+	GetMonitorInfoW(monitor, &monitorInfo);
+	
+
+	DWORD style = WS_OVERLAPPEDWINDOW | WS_VISIBLE;
+	DWORD exStyle = WS_EX_OVERLAPPEDWINDOW | WS_EX_APPWINDOW;
+
+	if (enabled)
+	{
+		style = WS_POPUP | WS_VISIBLE;
+		exStyle = WS_EX_APPWINDOW;
+	}
+
+	SetWindowLongW(m_hwnd, GWL_STYLE, style);
+	SetWindowLongW(m_hwnd, GWL_EXSTYLE, exStyle);
+
+	m_isFullscreen = enabled;
+
+	if (enabled)
+	{
+		SetWindowPos(m_hwnd, nullptr,
+			monitorInfo.rcMonitor.left,
+			monitorInfo.rcMonitor.top,
+			monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left,
+			monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top, SWP_NOZORDER
+		);
+	}
+	else 
+	{
+		m_width /= 1.5;
+		m_height /= 1.5;
+		CenterWindow();
+	}
+}
+
+void DXWindow::CenterWindow()
+{
+	if (!m_hwnd)
+		return;
+	if (IsFullscreen())
+		return;
+	
+	HMONITOR monitor = MonitorFromWindow(m_hwnd, MONITOR_DEFAULTTONEAREST);
+	MONITORINFO monitorInfo = { 0 };
+	monitorInfo.cbSize = sizeof(monitorInfo);
+	GetMonitorInfoW(monitor, &monitorInfo);
+
+	int monitorWidth = monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left;
+	int monitorHeight = monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top;
+
+	int x = monitorWidth / 2 - m_width / 2;
+	int y = monitorHeight / 2 - m_height / 2;
+
+	MoveWindow(m_hwnd, x, y, m_width, m_height, FALSE);
+}
+
 LRESULT DXWindow::OnWindowMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
+		case WM_KEYDOWN: {
+			if (wParam == VK_F11)
+				Get().SetFullscreen(!Get().IsFullscreen());
+			break;
+		}
 		case WM_CLOSE: {
 			Get().m_shouldClose = true;
 			break;

@@ -21,6 +21,8 @@ int main(int argc, char* argv[])
 	if (!DXWindow::Get().Init())
 		return 2;
 
+	DXWindow::Get().SetFullscreen(true);
+
 	init.StopAndPrintTime();
 
 	bool running = true;

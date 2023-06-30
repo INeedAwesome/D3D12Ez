@@ -21,9 +21,12 @@ public:
 	void Update();
 	void Present();
 	void Resize();
+	void SetFullscreen(bool enabled);
+	void CenterWindow();
 
 	inline bool ShouldClose() {	return m_shouldClose; }
 	inline bool ShouldResize() { return m_shouldResize; }
+	inline bool IsFullscreen() { return m_isFullscreen; }
 	static constexpr size_t GetFrameCount() { return 2; }
 
 private:
@@ -35,9 +38,11 @@ private:
 	HWND m_hwnd;
 	bool m_shouldClose = false;
 	
-	UINT m_width = 1920;
-	UINT m_height = 1080;
+	UINT m_width = 1280;
+	UINT m_height = 720;
 	bool m_shouldResize = false;
+
+	bool m_isFullscreen = false;
 
 	ComPointer<IDXGISwapChain4> m_swapChain;
 };
