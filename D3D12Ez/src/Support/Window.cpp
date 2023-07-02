@@ -177,8 +177,8 @@ void DXWindow::CenterWindow()
 	int monitorWidth = monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left;
 	int monitorHeight = monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top;
 
-	int x = monitorWidth / 2 - m_width / 2;
-	int y = monitorHeight / 2 - m_height / 2;
+	int x = (monitorWidth / 2 - m_width / 2) + monitorInfo.rcMonitor.left;
+	int y = (monitorHeight / 2 - m_height / 2) + monitorInfo.rcMonitor.top;
 
 	MoveWindow(m_hwnd, x, y, m_width, m_height, FALSE);
 }
