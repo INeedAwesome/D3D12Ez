@@ -4,26 +4,34 @@ project "D3D12Ez"
    cppdialect "C++20"
    targetdir "bin/%{cfg.buildcfg}"
    staticruntime "off"
+   dependson { "StartupScreen" }
 
 --   pchheader "stdafx.h"
 --   pchsource "../%{prj.name}/src/stdafx.cpp"
 
    files { "src/**.h", "src/**.cpp" }
-
+   
+   targetdir ("../bin/" .. outputdir .. "-%{prj.name}")
+   objdir ("../bin-int/" .. outputdir .. "-%{prj.name}")
+   
    includedirs
    {
-      "src/"
+      "src/", 
+      "../StartupScreen/src"
+   }
+
+   libdirs 
+   {
+      "%{targetdir}"
    }
 
    links 
    { 
       "d3d12.lib", 
       "dxgi.lib", 
-      "dxguid.lib" 
+      "dxguid.lib",
+      "StartupScreen"
    }
-
-   targetdir ("../bin/" .. outputdir .. "-%{prj.name}")
-   objdir ("../bin-int/" .. outputdir .. "-%{prj.name}")
 
    filter "system:windows"
       systemversion "latest"
@@ -39,6 +47,13 @@ project "D3D12Ez"
 
    filter "configurations:Release"
       defines { "EZ_RELEASE" }
+      runtime "Release"
+      optimize "On"
+      symbols "Off"
+
+   filter "configurations:Dist"
+      kind "WindowedApp"
+      defines { "ST_DIST" }
       runtime "Release"
       optimize "On"
       symbols "Off"

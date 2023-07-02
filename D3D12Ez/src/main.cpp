@@ -8,8 +8,13 @@
 #include "D3D/DXContext.h"
 #include "Debug/Timer.h"
 
+#include "PrintClass.h"
+
 int main(int argc, char* argv[])
 {
+	PrintClass classs;
+	classs.PrintHI();
+
 	Timer init("DirectX & Window Init");
 
 	std::cout << "Hello World!" << std::endl;
