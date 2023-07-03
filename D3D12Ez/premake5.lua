@@ -30,7 +30,7 @@ project "D3D12Ez"
       "d3d12.lib", 
       "dxgi.lib", 
       "dxguid.lib",
-      "StartupScreen.lib"
+      "StartupScreen"
    }
 
    postbuildcommands 

@@ -15,6 +15,7 @@ int main(int argc, char* argv[])
 {
 	strt::LauncherWindow::Get().Init(450, 300);
 	strt::LauncherSettings launcherSettings = strt::LauncherWindow::Get().Open();
+	strt::LauncherWindow::Get().~LauncherWindow();
 
 	Timer init("DirectX & Window Init");
 

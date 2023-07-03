@@ -190,6 +190,8 @@ LRESULT DXWindow::OnWindowMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 		case WM_KEYDOWN: {
 			if (wParam == VK_F11)
 				Get().SetFullscreen(!Get().IsFullscreen());
+			if (wParam == VK_ESCAPE)
+				Get().m_shouldClose = true;
 			break;
 		}
 		case WM_CLOSE: {
