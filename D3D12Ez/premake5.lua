@@ -22,7 +22,7 @@ project "D3D12Ez"
 
    libdirs 
    {
-      "$(SolutionDir)bin/" .. outputdir .. "-StartupScreen/"
+      "$(SolutionDir)bin\\" .. outputdir .. "-StartupScreen\\"
    }
 
    links 
@@ -35,7 +35,7 @@ project "D3D12Ez"
 
    postbuildcommands 
    { 
-      "{COPY} $(SolutionDir)bin/" .. outputdir .. "-StartupScreen/StartupScreen.dll $(SolutionDir)bin/" .. outputdir .. "-D3D12Ez"
+      "copy $(SolutionDir)bin\\" .. outputdir .. "-StartupScreen\\StartupScreen.dll $(SolutionDir)bin\\" .. outputdir .. "-D3D12Ez\\"
    }
 
    filter "system:windows"

@@ -13,14 +13,27 @@
 
 int main(int argc, char* argv[])
 {
-	strt::LauncherWindow::Get().Init(450, 300);
-	strt::LauncherSettings launcherSettings = strt::LauncherWindow::Get().Open();
-	strt::LauncherWindow::Get().~LauncherWindow();
+	bool running = true;
 
+	strt::LauncherSettings settingsFromLauncher = { true, 400, 300};
+	
+	if (!strt::LauncherWindow::Get().Init(450, 300))
+		return -1;
+
+	while (running)
+	{
+		strt::LauncherWindow::Get().Update();
+
+		if (strt::LauncherWindow::Get().ShouldClose()) 
+			running = false;
+	}
+	//strt::LauncherWindow::Get().SetSettings();
+	strt::LauncherWindow::Get().Shutdown(); 
+	
 	Timer init("DirectX & Window Init");
 
-	std::cout << "Hello World!" << std::endl;
-	DXDebugLayer::Get().Init();
+	std::cout << "Hello World!" << std::endl; 
+	DXDebugLayer::Get().Init(); 
 
 	if (!DXContext::Get().Init())
 		return 1;
@@ -28,12 +41,11 @@ int main(int argc, char* argv[])
 	if (!DXWindow::Get().Init())
 		return 2;
 
-	if (launcherSettings.fullscreen)
+	if (settingsFromLauncher.fullscreen)
 		DXWindow::Get().SetFullscreen(true);
 
 	init.StopAndPrintTime();
 
-	bool running = true;
 	while (!DXWindow::Get().ShouldClose())
 	{
 		DXWindow::Get().Update();
