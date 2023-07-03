@@ -8,12 +8,13 @@
 #include "D3D/DXContext.h"
 #include "Debug/Timer.h"
 
-#include "PrintClass.h"
+#include <memory>
+#include "Window/LauncherWindow.h"
 
 int main(int argc, char* argv[])
 {
-	PrintClass classs;
-	classs.PrintHI();
+	strt::LauncherWindow::Get().Init(450, 300);
+	strt::LauncherSettings launcherSettings = strt::LauncherWindow::Get().Open();
 
 	Timer init("DirectX & Window Init");
 
@@ -26,7 +27,8 @@ int main(int argc, char* argv[])
 	if (!DXWindow::Get().Init())
 		return 2;
 
-	DXWindow::Get().SetFullscreen(true);
+	if (launcherSettings.fullscreen)
+		DXWindow::Get().SetFullscreen(true);
 
 	init.StopAndPrintTime();
 
