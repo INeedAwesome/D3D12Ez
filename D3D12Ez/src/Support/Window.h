@@ -35,7 +35,7 @@ private:
 	static LRESULT CALLBACK OnWindowMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	ATOM m_windowClass = 0;
-	HWND m_hwnd;
+	HWND m_hwnd = nullptr;
 	bool m_shouldClose = false;
 	
 	UINT m_width = 1280;
@@ -44,6 +44,6 @@ private:
 
 	bool m_isFullscreen = false;
 
-	ComPointer<IDXGISwapChain4> m_swapChain;
+	ComPointer<IDXGISwapChain4> m_swapChain = nullptr;
 };
 

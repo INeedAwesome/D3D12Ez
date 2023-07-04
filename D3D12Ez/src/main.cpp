@@ -4,34 +4,34 @@
 #include "Support/ComPointer.h"
 #include "Support/Window.h"
 
-#include "Debug/DXDebugLayer.h"
+#include "Debug/DXDebugLayer.h" 
 #include "D3D/DXContext.h"
 #include "Debug/Timer.h"
 
-#include <memory>
 #include "Window/LauncherWindow.h"
 
 int main(int argc, char* argv[])
 {
-	bool running = true;
+	bool running = true; 
 
-	strt::LauncherSettings settingsFromLauncher = { true, 400, 300};
+	strt::LauncherSettings settingsFromLauncher = { true, 400, 300}; 
 	
-	if (!strt::LauncherWindow::Get().Init(450, 300))
-		return -1;
+	strt::LauncherWindow launcher;  
+	launcher.Init(450, 300);
 
 	while (running)
-	{
-		strt::LauncherWindow::Get().Update();
+	{ 
+		if (!launcher.ShouldClose())
+		{
+			running = false; 
+		}
 
-		if (strt::LauncherWindow::Get().ShouldClose()) 
-			running = false;
+		launcher.Update();
 	}
-	//strt::LauncherWindow::Get().SetSettings();
-	strt::LauncherWindow::Get().Shutdown(); 
+	settingsFromLauncher = launcher.Shutdown();
 	
 	Timer init("DirectX & Window Init");
-
+	 
 	std::cout << "Hello World!" << std::endl; 
 	DXDebugLayer::Get().Init(); 
 
@@ -48,22 +48,21 @@ int main(int argc, char* argv[])
 
 	while (!DXWindow::Get().ShouldClose())
 	{
-		DXWindow::Get().Update();
+		DXWindow::Get().Update(); 
 		if (DXWindow::Get().ShouldResize())
 		{
 			DXContext::Get().Flush(DXWindow::GetFrameCount());
 			DXWindow::Get().Resize();
 		}
 
-		auto* commandList = DXContext::Get().InitCommandList();
+		auto* commandList = DXContext::Get().InitCommandList(); 
 
-		// a lot of setup
-		// a draw
+		// draw
 
 
 		DXContext::Get().ExecuteCommandList();
 
-		// presenting it to the screen
+		// presenting it to the screen 
 		DXWindow::Get().Present();
 
 	}
