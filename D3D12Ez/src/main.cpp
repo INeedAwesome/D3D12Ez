@@ -9,27 +9,20 @@
 #include "Debug/Timer.h"
 
 #include "Window/LauncherWindow.h"
-
+ 
 int main(int argc, char* argv[])
-{
-	bool running = true; 
-
-	strt::LauncherSettings settingsFromLauncher = { true, 400, 300}; 
+{ 
+	strt::LauncherSettings settingsFromLauncher = { true, 400, 300};  
 	
 	strt::LauncherWindow launcher;  
-	launcher.Init(450, 300);
-
-	while (running)
-	{ 
-		if (!launcher.ShouldClose())
-		{
-			running = false; 
-		}
-
-		launcher.Update();
-	}
-	settingsFromLauncher = launcher.Shutdown();
+	launcher.Init(450, 300); 
+	  
+	launcher.Update(); 
 	
+	settingsFromLauncher = launcher.Shutdown();
+
+
+	/*
 	Timer init("DirectX & Window Init");
 	 
 	std::cout << "Hello World!" << std::endl; 
@@ -74,5 +67,6 @@ int main(int argc, char* argv[])
 	DXWindow::Get().Shutdown();
 	DXContext::Get().Shutdown();
 	DXDebugLayer::Get().Shutdown();
+	*/
 	return 0;
 }

@@ -4,15 +4,14 @@ project "D3D12Ez"
    cppdialect "C++20"
    targetdir "bin/%{cfg.buildcfg}"
    staticruntime "off"
-   dependson { "StartupScreen" }
 
 --   pchheader "stdafx.h"
 --   pchsource "../%{prj.name}/src/stdafx.cpp"
 
    files { "src/**.h", "src/**.cpp" }
    
-   targetdir ("../bin/" .. outputdir .. "-%{prj.name}")
-   objdir ("../bin-int/" .. outputdir .. "-%{prj.name}")
+   targetdir ("$(SolutionDir)bin\\" .. outputdir .. "-%{prj.name}")
+   objdir ("$(SolutionDir)bin-int\\" .. outputdir .. "-%{prj.name}")
    
    includedirs
    {
@@ -36,6 +35,11 @@ project "D3D12Ez"
    postbuildcommands 
    { 
       "copy $(SolutionDir)bin\\" .. outputdir .. "-StartupScreen\\StartupScreen.dll $(SolutionDir)bin\\" .. outputdir .. "-D3D12Ez\\"
+   }
+
+   dependson 
+   { 
+      "StartupScreen" 
    }
 
    filter "system:windows"
