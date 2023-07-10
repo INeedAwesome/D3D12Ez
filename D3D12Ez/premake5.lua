@@ -2,7 +2,6 @@ project "D3D12Ez"
    kind "ConsoleApp"
    language "C++"
    cppdialect "C++20"
-   targetdir "bin/%{cfg.buildcfg}"
    staticruntime "off"
 
 --   pchheader "stdafx.h"
@@ -15,21 +14,14 @@ project "D3D12Ez"
    
    includedirs
    {
-      "src/", 
-      "../StartupScreen/src"
-   }
-
-   libdirs 
-   {
-      "$(SolutionDir)bin\\" .. outputdir .. "-StartupScreen\\"
+      "src/"
    }
 
    links 
    { 
       "d3d12.lib", 
       "dxgi.lib", 
-      "dxguid.lib",
-      "StartupScreen"
+      "dxguid.lib"
    }
 
    filter "system:windows"
