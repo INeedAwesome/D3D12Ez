@@ -8,34 +8,22 @@
 #include "D3D/DXContext.h"
 #include "Debug/Timer.h"
 
-#include "Window/LauncherWindow.h"
- 
-int main(int argc, char* argv[])
-{ 
-	strt::LauncherSettings settingsFromLauncher = { true, 400, 300};  
-	
-	strt::LauncherWindow launcher;  
-	launcher.Init(450, 300); 
-	  
-	launcher.Update(); 
-	
-	settingsFromLauncher = launcher.Shutdown();
+int main(int argc, char* argv[]) 
+{  
 
-
-	/*
+	
 	Timer init("DirectX & Window Init");
-	 
+	  
 	std::cout << "Hello World!" << std::endl; 
 	DXDebugLayer::Get().Init(); 
 
 	if (!DXContext::Get().Init())
 		return 1;
-
+	 
 	if (!DXWindow::Get().Init())
 		return 2;
 
-	if (settingsFromLauncher.fullscreen)
-		DXWindow::Get().SetFullscreen(true);
+	DXWindow::Get().SetFullscreen(true);
 
 	init.StopAndPrintTime();
 
@@ -67,6 +55,7 @@ int main(int argc, char* argv[])
 	DXWindow::Get().Shutdown();
 	DXContext::Get().Shutdown();
 	DXDebugLayer::Get().Shutdown();
-	*/
+	
+
 	return 0;
 }

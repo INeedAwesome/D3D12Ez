@@ -32,16 +32,6 @@ project "D3D12Ez"
       "StartupScreen"
    }
 
-   postbuildcommands 
-   { 
-      "copy $(SolutionDir)bin\\" .. outputdir .. "-StartupScreen\\StartupScreen.dll $(SolutionDir)bin\\" .. outputdir .. "-D3D12Ez\\"
-   }
-
-   dependson 
-   { 
-      "StartupScreen" 
-   }
-
    filter "system:windows"
       systemversion "latest"
       defines { "EZ_PLATFORM_WINDOWS" }
