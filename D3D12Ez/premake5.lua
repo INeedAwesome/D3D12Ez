@@ -44,7 +44,7 @@ project "D3D12Ez"
 
    filter "configurations:Dist"
       kind "WindowedApp"
-      defines { "ST_DIST" }
+      defines { "EZ_DIST" }
       runtime "Release"
       optimize "On"
       symbols "Off"

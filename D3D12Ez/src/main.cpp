@@ -8,10 +8,13 @@
 #include "D3D/DXContext.h"
 #include "Debug/Timer.h"
 
+#ifdef EZ_DIST
+int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
+#endif //EZ_DIST
+#ifndef EZ_DIST
 int main(int argc, char* argv[]) 
+#endif //EZ_DIST
 {  
-
-	
 	Timer init("DirectX & Window Init");
 	  
 	std::cout << "Hello World!" << std::endl; 
@@ -36,18 +39,20 @@ int main(int argc, char* argv[])
 			DXWindow::Get().Resize();
 		}
 
+		// begin drawing
 		auto* commandList = DXContext::Get().InitCommandList(); 
+		DXWindow::Get().BeginFrame(commandList);
 
 		// draw
 
 
+		// end draw
+		DXWindow::Get().EndFrame(commandList);
 		DXContext::Get().ExecuteCommandList();
 
 		// presenting it to the screen 
 		DXWindow::Get().Present();
-
 	}
-
 
 	//flushing
 	DXContext::Get().Flush(DXWindow::GetFrameCount());

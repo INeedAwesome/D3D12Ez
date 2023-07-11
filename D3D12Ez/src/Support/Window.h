@@ -24,13 +24,20 @@ public:
 	void SetFullscreen(bool enabled);
 	void CenterWindow();
 
+	void BeginFrame(ID3D12GraphicsCommandList7* cmdList);
+	void EndFrame(ID3D12GraphicsCommandList7* cmdList);
+
 	inline bool ShouldClose() {	return m_shouldClose; }
 	inline bool ShouldResize() { return m_shouldResize; }
 	inline bool IsFullscreen() { return m_isFullscreen; }
-	static constexpr size_t GetFrameCount() { return 2; }
+	static constexpr uint32_t m_frameCount = 2;
+	static constexpr uint32_t GetFrameCount() { return m_frameCount; }
 
 private:
 	DXWindow() = default;
+
+	bool GetBuffers();
+	void ReleaseBuffers();
 
 	static LRESULT CALLBACK OnWindowMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -45,5 +52,7 @@ private:
 	bool m_isFullscreen = false;
 
 	ComPointer<IDXGISwapChain4> m_swapChain = nullptr;
+	ComPointer<ID3D12Resource2> m_buffers[m_frameCount];
+	uint32_t m_currentBufferIndex = 0;
 };
 

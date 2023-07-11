@@ -76,14 +76,18 @@ bool DXWindow::Init()
 	if (!sc1.QueryInterface(m_swapChain))
 		return false;
 
+	if (!GetBuffers())
+		return false;
+
 	return true;
 
 }
 
 void DXWindow::Shutdown()
 {
-	if (m_swapChain)
-		m_swapChain.Release();
+	ReleaseBuffers();
+
+	m_swapChain.Release();
 
 	if (m_hwnd)
 		DestroyWindow(m_hwnd);
@@ -106,10 +110,13 @@ void DXWindow::Update()
 void DXWindow::Present()
 {
 	m_swapChain->Present(1, 0);
+	
 }
 
 void DXWindow::Resize()
 {
+	ReleaseBuffers();
+
 	RECT clientRect;
 	if (!GetClientRect(m_hwnd, &clientRect))
 		return;
@@ -120,6 +127,7 @@ void DXWindow::Resize()
 	m_swapChain->ResizeBuffers(GetFrameCount(), m_width, m_height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING);
 	m_shouldResize = false;
 
+	GetBuffers();
 }
 
 void DXWindow::SetFullscreen(bool enabled)
@@ -183,6 +191,53 @@ void DXWindow::CenterWindow()
 	MoveWindow(m_hwnd, x, y, m_width, m_height, FALSE);
 }
 
+void DXWindow::BeginFrame(ID3D12GraphicsCommandList7* cmdList)
+{
+	m_currentBufferIndex = m_swapChain->GetCurrentBackBufferIndex();
+
+	D3D12_RESOURCE_BARRIER barrier;
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier.Transition.pResource = m_buffers[m_currentBufferIndex];
+	barrier.Transition.Subresource = 0;
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+
+	cmdList->ResourceBarrier(1, &barrier);
+}
+
+void DXWindow::EndFrame(ID3D12GraphicsCommandList7* cmdList)
+{
+	D3D12_RESOURCE_BARRIER barrier;
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier.Transition.pResource = m_buffers[m_currentBufferIndex];
+	barrier.Transition.Subresource = 0;
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+
+	cmdList->ResourceBarrier(1, &barrier);
+}
+
+bool DXWindow::GetBuffers()
+{
+	for (uint32_t i = 0; i < GetFrameCount(); i++)
+	{
+		if (FAILED(m_swapChain->GetBuffer(i, IID_PPV_ARGS(&m_buffers[i]))))
+			return false;
+	}
+	return true;
+}
+
+void DXWindow::ReleaseBuffers()
+{
+	for (uint32_t i = 0; i < GetFrameCount(); i++)
+	{
+		m_buffers[i].Release();
+
+	}
+}
+
 LRESULT DXWindow::OnWindowMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
@@ -192,18 +247,17 @@ LRESULT DXWindow::OnWindowMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 				Get().SetFullscreen(!Get().IsFullscreen());
 			if (wParam == VK_ESCAPE)
 				Get().m_shouldClose = true;
-			break;
+			return 0;
 		}
 		case WM_CLOSE: {
 			Get().m_shouldClose = true;
-			break;
+			return 0;
 		}
 		case WM_SIZE: {
 			if (lParam && (HIWORD(lParam) != Get().m_height || LOWORD(lParam) != Get().m_width))
 				Get().m_shouldResize = true;
-			break;
+			return 0;
 		}
-	default:
-		return DefWindowProc(hwnd, msg, wParam, lParam);
 	}
+	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
