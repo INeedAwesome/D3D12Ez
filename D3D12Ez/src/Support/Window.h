@@ -54,5 +54,9 @@ private:
 	ComPointer<IDXGISwapChain4> m_swapChain = nullptr;
 	ComPointer<ID3D12Resource2> m_buffers[m_frameCount];
 	uint32_t m_currentBufferIndex = 0;
+	
+	ComPointer<ID3D12DescriptorHeap> m_rtvDescHeap;
+	D3D12_CPU_DESCRIPTOR_HANDLE m_rtvHandles[m_frameCount];
+
 };
 

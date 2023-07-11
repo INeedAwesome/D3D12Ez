@@ -76,8 +76,27 @@ bool DXWindow::Init()
 	if (!sc1.QueryInterface(m_swapChain))
 		return false;
 
+	// create rtv heap
+	D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc{};
+	descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+	descHeapDesc.NumDescriptors = GetFrameCount();
+	descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+	descHeapDesc.NodeMask = 0;
+
+	if (FAILED(DXContext::Get().GetDevice()->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&m_rtvDescHeap))))
+		return false;
+
+	auto firstHandle = m_rtvDescHeap->GetCPUDescriptorHandleForHeapStart();
+	auto handleIncrement = DXContext::Get().GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	for (uint32_t i = 0; i < GetFrameCount(); i++)
+	{
+		m_rtvHandles[i] = firstHandle;
+		m_rtvHandles[i].ptr += handleIncrement * i;
+	}
+
 	if (!GetBuffers())
 		return false;
+
 
 	return true;
 
@@ -86,6 +105,8 @@ bool DXWindow::Init()
 void DXWindow::Shutdown()
 {
 	ReleaseBuffers();
+
+	m_rtvDescHeap.Release();
 
 	m_swapChain.Release();
 
@@ -204,6 +225,11 @@ void DXWindow::BeginFrame(ID3D12GraphicsCommandList7* cmdList)
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 
 	cmdList->ResourceBarrier(1, &barrier);
+
+	float clearColor[4] = { 1.0f, 1.0f, 0.2f, 1.0f};
+	cmdList->ClearRenderTargetView(m_rtvHandles[m_currentBufferIndex], clearColor, 0, nullptr);
+
+	cmdList->OMSetRenderTargets(1, &m_rtvHandles[m_currentBufferIndex], false, nullptr);
 }
 
 void DXWindow::EndFrame(ID3D12GraphicsCommandList7* cmdList)
@@ -225,6 +251,14 @@ bool DXWindow::GetBuffers()
 	{
 		if (FAILED(m_swapChain->GetBuffer(i, IID_PPV_ARGS(&m_buffers[i]))))
 			return false;
+
+		D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+		//rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+		rtvDesc.Texture2D.MipSlice = 0;
+		rtvDesc.Texture2D.PlaneSlice = 0;
+
+		DXContext::Get().GetDevice()->CreateRenderTargetView(m_buffers[i], &rtvDesc, m_rtvHandles[i]);
 	}
 	return true;
 }
@@ -234,7 +268,6 @@ void DXWindow::ReleaseBuffers()
 	for (uint32_t i = 0; i < GetFrameCount(); i++)
 	{
 		m_buffers[i].Release();
-
 	}
 }
 

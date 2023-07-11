@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
 		DXContext::Get().ExecuteCommandList();
 
 		// presenting it to the screen 
-		DXWindow::Get().Present();
+		DXWindow::Get().Present(); 
 	}
 
 	//flushing
