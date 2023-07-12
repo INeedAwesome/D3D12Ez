@@ -15,7 +15,10 @@ public:
 		static DXWindow instance;
 		return instance;
 	}
+private:
+	DXWindow() = default;
 
+public:
 	bool Init();
 	void Shutdown();
 	void Update();
@@ -34,8 +37,6 @@ public:
 	static constexpr uint32_t GetFrameCount() { return m_frameCount; }
 
 private:
-	DXWindow() = default;
-
 	bool GetBuffers();
 	void ReleaseBuffers();
 
