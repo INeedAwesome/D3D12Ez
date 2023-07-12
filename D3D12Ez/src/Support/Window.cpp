@@ -54,7 +54,7 @@ bool DXWindow::Init()
 	{
 		swapChainDesc.Width = m_width;
 		swapChainDesc.Height = m_height;
-		swapChainDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+		swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		swapChainDesc.Stereo = false;
 		swapChainDesc.SampleDesc.Count = 1;
 		swapChainDesc.SampleDesc.Quality = 0; // MMAA
@@ -226,7 +226,7 @@ void DXWindow::BeginFrame(ID3D12GraphicsCommandList7* cmdList)
 
 	cmdList->ResourceBarrier(1, &barrier);
 
-	float clearColor[4] = { 1.0f, 1.0f, 0.2f, 1.0f};
+	float clearColor[4] = { 0.2f, 0.3f, 0.5f, 1.0f};
 	cmdList->ClearRenderTargetView(m_rtvHandles[m_currentBufferIndex], clearColor, 0, nullptr);
 
 	cmdList->OMSetRenderTargets(1, &m_rtvHandles[m_currentBufferIndex], false, nullptr);
@@ -253,7 +253,7 @@ bool DXWindow::GetBuffers()
 			return false;
 
 		D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
-		//rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 		rtvDesc.Texture2D.MipSlice = 0;
 		rtvDesc.Texture2D.PlaneSlice = 0;
