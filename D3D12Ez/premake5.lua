@@ -27,9 +27,6 @@ project "D3D12Ez"
    filter "system:windows"
       systemversion "latest"
       defines { "EZ_PLATFORM_WINDOWS" }
-   filter "system:linux"
-      systemversion "latest"
-      defines { "EZ_PLATFORM_LINUX" }
 
    filter "configurations:Debug"
       defines { "EZ_DEBUG" }
