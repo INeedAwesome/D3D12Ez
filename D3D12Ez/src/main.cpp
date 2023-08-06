@@ -3,6 +3,7 @@
 #include "Support/WinInclude.h"
 #include "Support/ComPointer.h"
 #include "Support/Window.h"
+#include "Support/Shader.h"
 
 #include "Debug/DXDebugLayer.h" 
 #include "D3D/DXContext.h"
@@ -30,7 +31,9 @@ int main(int argc, char* argv[])
 
 	init.StopAndPrintTime();
 
+	Timer dxInit("DirectX Pipeline Init");
 
+	// ====== HEAP PROPERTIES ON GPU ======
 
 	D3D12_HEAP_PROPERTIES hpUpload{};
 	{
@@ -49,7 +52,9 @@ int main(int argc, char* argv[])
 		hpDefault.CreationNodeMask = 0;
 		hpDefault.VisibleNodeMask = 0;
 	}
+
 	// ====== VERTEX DATA ======
+
 	const char* hello = "Hello World!";
 
 	struct Vertex 
@@ -88,6 +93,7 @@ int main(int argc, char* argv[])
 
 	ComPointer<ID3D12Resource> uploadBuffer, vertexBuffer;
 
+	// Create resources on GPU heap
 	DXContext::Get().GetDevice()->CreateCommittedResource(
 		&hpUpload,
 		D3D12_HEAP_FLAG_NONE, &rDesc, D3D12_RESOURCE_STATE_COMMON, nullptr,
@@ -116,33 +122,39 @@ int main(int argc, char* argv[])
 	commandList->CopyBufferRegion(vertexBuffer, 0, uploadBuffer, 0, 1024);
 	DXContext::Get().ExecuteCommandList();
 
+	// ====== SHADERS ======
+
+	Shader vertexShader("VertexShader.cso");
+	Shader pixelShader("PixelShader.cso");
 
 	// ====== PIPELINE STATE ======
 
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC gfxpDesc{};
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 	{
-		gfxpDesc.pRootSignature;
-		gfxpDesc.VS;
-		gfxpDesc.PS;
-		gfxpDesc.DS;
-		gfxpDesc.HS;
-		gfxpDesc.GS;
-		gfxpDesc.StreamOutput;
-		gfxpDesc.BlendState;
-		gfxpDesc.SampleMask;
-		gfxpDesc.RasterizerState;
-		gfxpDesc.DepthStencilState;
-		gfxpDesc.InputLayout.NumElements = _countof(vertexLayout);
-		gfxpDesc.InputLayout.pInputElementDescs = vertexLayout;
-		gfxpDesc.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;
-		gfxpDesc.PrimitiveTopologyType;
-		gfxpDesc.NumRenderTargets;
-		gfxpDesc.RTVFormats[8];
-		gfxpDesc.DSVFormat;
-		gfxpDesc.SampleDesc;
-		gfxpDesc.NodeMask;
-		gfxpDesc.CachedPSO;
-		gfxpDesc.Flags;
+		graphicsPipelineStateDesc.pRootSignature; 
+		graphicsPipelineStateDesc.VS.pShaderBytecode = vertexShader.GetBuffer();
+		graphicsPipelineStateDesc.VS.BytecodeLength = vertexShader.GetSize();
+		graphicsPipelineStateDesc.PS.pShaderBytecode = pixelShader.GetBuffer();;
+		graphicsPipelineStateDesc.PS.BytecodeLength = pixelShader.GetSize();;
+		graphicsPipelineStateDesc.DS;
+		graphicsPipelineStateDesc.HS;
+		graphicsPipelineStateDesc.GS;
+		graphicsPipelineStateDesc.StreamOutput;
+		graphicsPipelineStateDesc.BlendState;
+		graphicsPipelineStateDesc.SampleMask;
+		graphicsPipelineStateDesc.RasterizerState;
+		graphicsPipelineStateDesc.DepthStencilState;
+		graphicsPipelineStateDesc.InputLayout.NumElements = _countof(vertexLayout);
+		graphicsPipelineStateDesc.InputLayout.pInputElementDescs = vertexLayout;
+		graphicsPipelineStateDesc.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;
+		graphicsPipelineStateDesc.PrimitiveTopologyType;
+		graphicsPipelineStateDesc.NumRenderTargets;
+		graphicsPipelineStateDesc.RTVFormats[8];
+		graphicsPipelineStateDesc.DSVFormat;
+		graphicsPipelineStateDesc.SampleDesc;
+		graphicsPipelineStateDesc.NodeMask;
+		graphicsPipelineStateDesc.CachedPSO;
+		graphicsPipelineStateDesc.Flags;
 	}
 	//DXContext::Get().GetDevice()->CreatePipelineState()
 
@@ -155,6 +167,7 @@ int main(int argc, char* argv[])
 		vbv.StrideInBytes = sizeof(Vertex);
 	}
 
+	dxInit.StopAndPrintTime();
 
 	while (!DXWindow::Get().ShouldClose())
 	{
