@@ -6,23 +6,18 @@
 #include <filesystem>
 #include <cstdlib>
 
-
-
 Shader::Shader(std::string_view name)
 {
 	static std::filesystem::path shaderDir;
 
-	if (!shaderDir.empty())
+	if (shaderDir.empty())
 	{
-		return;
+		wchar_t moduleFileName[MAX_PATH];
+		GetModuleFileNameW(nullptr, moduleFileName, MAX_PATH);
+
+		shaderDir = moduleFileName;
+		shaderDir.remove_filename();
 	}
-
-	wchar_t moduleFilename[MAX_PATH];
-	GetModuleFileNameW(nullptr, moduleFilename, MAX_PATH);
-
-	shaderDir = moduleFilename;
-	shaderDir.remove_filename();
-
 	std::ifstream shaderIn(shaderDir / name, std::ios::binary);
 	if (!shaderIn.is_open())
 	{
