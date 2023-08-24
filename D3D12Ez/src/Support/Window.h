@@ -30,6 +30,9 @@ public:
 	void BeginFrame(ID3D12GraphicsCommandList7* cmdList);
 	void EndFrame(ID3D12GraphicsCommandList7* cmdList);
 
+	inline uint32_t GetWidth() const { return m_width; }
+	inline uint32_t GetHeight() const { return m_height; }
+
 	inline bool ShouldClose() {	return m_shouldClose; }
 	inline bool ShouldResize() { return m_shouldResize; }
 	inline bool IsFullscreen() { return m_isFullscreen; }

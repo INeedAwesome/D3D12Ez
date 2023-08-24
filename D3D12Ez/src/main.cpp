@@ -275,6 +275,26 @@ int main(int argc, char* argv[])
 		commandList->IASetVertexBuffers(0, 1, &vbv);
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST); 
 
+		// RS
+		D3D12_VIEWPORT viewport{};
+		{
+			viewport.TopLeftX = 0;
+			viewport.TopLeftY = 0;
+			viewport.Width = DXWindow::Get().GetWidth();
+			viewport.Height = DXWindow::Get().GetHeight();
+			viewport.MinDepth = 1.0f;
+			viewport.MaxDepth = 0.0f;
+		}
+		RECT scissorRect{};
+		{
+			scissorRect.left = 0;
+			scissorRect.top = 0;
+			scissorRect.right = DXWindow::Get().GetWidth();
+			scissorRect.bottom = DXWindow::Get().GetHeight();
+		}
+		commandList->RSSetViewports(1, &viewport);
+		commandList->RSSetScissorRects(1, &scissorRect);
+
 		// draw
 		commandList->DrawInstanced(_countof(vertices), 1, 0, 0);
 
@@ -293,6 +313,8 @@ int main(int argc, char* argv[])
 
 	vertexBuffer.Release();
 	uploadBuffer.Release();
+	pipelineStateObject.Release();
+	rootSignature.Release();
 
 	DXWindow::Get().Shutdown();
 	DXContext::Get().Shutdown();
