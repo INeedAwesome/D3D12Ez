@@ -11,3 +11,5 @@
 	#include <d3d12sdklayers.h>
 	#include <dxgidebug.h>
 #endif // _DEBUG
+
+#include <wincodec.h>

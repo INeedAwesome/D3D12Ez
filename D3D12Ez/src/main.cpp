@@ -2,12 +2,31 @@
 
 #include "Support/WinInclude.h"
 #include "Support/ComPointer.h"
+#include "Support/ImageLoader.h"
 #include "Support/Window.h"
 #include "Support/Shader.h"
 
 #include "Debug/DXDebugLayer.h" 
 #include "D3D/DXContext.h"
 #include "Debug/Timer.h"
+
+
+void pukeColor(float* color)
+{
+	static int pukeState = 0;
+	color[pukeState] += 0.01f;
+	if (color[pukeState] > 1.0f)
+	{
+		pukeState++;
+		if (pukeState == 3)
+		{
+			color[0] = .0f;
+			color[1] = .0f;
+			color[2] = .0f;
+			pukeState = 0;
+		}
+	}
+}
 
 #ifdef EZ_DIST
 int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
@@ -121,6 +140,9 @@ int main(int argc, char* argv[])
 	auto* commandList = DXContext::Get().InitCommandList();
 	commandList->CopyBufferRegion(vertexBuffer, 0, uploadBuffer, 0, 1024);
 	DXContext::Get().ExecuteCommandList();
+
+	ImageLoader::ImageData textureData;
+	ImageLoader::LoadImageFromDisk("./auge_512_512_BGRA_32BPP.png", textureData);
 
 	// ====== SHADERS ======
 
@@ -294,6 +316,11 @@ int main(int argc, char* argv[])
 		}
 		commandList->RSSetViewports(1, &viewport);
 		commandList->RSSetScissorRects(1, &scissorRect);
+
+		// Root arguments
+		static float color[] = {1, 0, 1};
+		pukeColor(color);
+		commandList->SetGraphicsRoot32BitConstants(0, 3, color, 0);
 
 		// draw
 		commandList->DrawInstanced(_countof(vertices), 1, 0, 0);
