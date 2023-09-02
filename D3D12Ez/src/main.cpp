@@ -400,13 +400,15 @@ int main(int argc, char* argv[])
 
 	// flushing
 	DXContext::Get().Flush(DXWindow::GetFrameCount());
+	
 
-	// close
-
+	texture.Release();
 	vertexBuffer.Release();
 	uploadBuffer.Release();
 	pipelineStateObject.Release();
 	rootSignature.Release();
+	
+	// close
 
 	DXWindow::Get().Shutdown();
 	DXContext::Get().Shutdown();

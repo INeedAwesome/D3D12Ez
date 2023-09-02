@@ -7,6 +7,7 @@
 	Root Signature layout GPU
 	 - b0		float3 "Color"
 	 - t0...	Texture2D<float4> "Textures"
+	 - s0		Sampler for "Textures"
 
 */
 
@@ -15,4 +16,5 @@
 "RootConstants(num32BitConstants=3, b0)," \
 "DescriptorTable(" \
 	"SRV(t0, numDescriptors = unbounded)" \
-")" 
+")," \
+"StaticSampler(s0)"
