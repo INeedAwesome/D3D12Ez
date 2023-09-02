@@ -1,6 +1,7 @@
 #include "RootSignature.hlsl"
 
 float3 color : register(b0);
+Texture2D<float4> textures[] : register(t0);
 
 [RootSignature(ROOTSIG)]
 float4 main() : SV_Target

@@ -13,46 +13,48 @@ const std::vector<ImageLoader::GUID_to_DXGI> ImageLoader::s_lookupTable =
 bool ImageLoader::LoadImageFromDisk(const std::filesystem::path& imagePath, ImageData& data)
 {
 	ComPointer<IWICImagingFactory> wicFactory;
-	if (FAILED(CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&wicFactory))))
-		return false;
+	if (FAILED(
+		CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&wicFactory)))) return false;
 
 	// Load Image
 	ComPointer <IWICStream > wicFileStream;
-	if (FAILED(wicFactory->CreateStream(&wicFileStream)))
-		return false;
+	if (FAILED(
+		wicFactory->CreateStream(&wicFileStream))) return false;
 
-	if (FAILED(wicFileStream->InitializeFromFilename(imagePath.wstring().c_str(), GENERIC_READ)))
-		return false;
+	if (FAILED(
+		wicFileStream->InitializeFromFilename(imagePath.wstring().c_str(), GENERIC_READ))) return false;
 
 	ComPointer<IWICBitmapDecoder> wicDecoder;
-	if (FAILED(wicFactory->CreateDecoderFromStream(wicFileStream, nullptr, WICDecodeMetadataCacheOnDemand, &wicDecoder)))
-		return false;
+	if (FAILED(
+		wicFactory->CreateDecoderFromStream(wicFileStream, nullptr, WICDecodeMetadataCacheOnDemand, &wicDecoder))) return false;
 
 	ComPointer<IWICBitmapFrameDecode> wicFrameDecoder;
-	if (FAILED(wicDecoder->GetFrame(0, &wicFrameDecoder)))
-		return false;
+	if (FAILED(
+		wicDecoder->GetFrame(0, &wicFrameDecoder))) return false;
 
 	// Trivial Image MetaData
-	if (FAILED(wicFrameDecoder->GetSize(&data.Width, &data.Height)))
-		return false;
-	if (FAILED(wicFrameDecoder->GetPixelFormat(&data.WicPixelFormat)))
-		return false;
+	if (FAILED(
+		wicFrameDecoder->GetSize(&data.Width, &data.Height))) return false;
+	if (FAILED(
+		wicFrameDecoder->GetPixelFormat(&data.WicPixelFormat))) return false;
 
 	// metadata of pixel format
 
 	ComPointer<IWICComponentInfo> wicComponentInfo;
-	if (FAILED(wicFactory->CreateComponentInfo(data.WicPixelFormat, &wicComponentInfo)))
-		return false;
+	if (FAILED(
+		wicFactory->CreateComponentInfo(data.WicPixelFormat, &wicComponentInfo))) return false;
 
 	ComPointer<IWICPixelFormatInfo> wicPixelFormatInfo;
-	if (FAILED(wicComponentInfo->QueryInterface(&wicPixelFormatInfo)))
-		return false;
+	if (FAILED(
+		wicComponentInfo->QueryInterface(&wicPixelFormatInfo))) return false;
 
 
 	// Get Data to struct
 
-	if (FAILED(wicPixelFormatInfo->GetBitsPerPixel(&data.BitsPerPixel))) return false;
-	if (FAILED(wicPixelFormatInfo->GetChannelCount(&data.ChannelCount))) return false;
+	if (FAILED(
+		wicPixelFormatInfo->GetBitsPerPixel(&data.BitsPerPixel))) return false;
+	if (FAILED(
+		wicPixelFormatInfo->GetChannelCount(&data.ChannelCount))) return false;
 
 	// DXGI PIXEL FORMAT
 	auto findIt = std::find_if(s_lookupTable.begin(), s_lookupTable.end(), [&](const GUID_to_DXGI& entry)
@@ -78,8 +80,8 @@ bool ImageLoader::LoadImageFromDisk(const std::filesystem::path& imagePath, Imag
 	copyRect.Height = data.Height;
 
 	
-	if (FAILED(wicFrameDecoder->CopyPixels(&copyRect, stride, size, (BYTE*)data.Data.data()))) 
-		return false;
+	if (FAILED(
+		wicFrameDecoder->CopyPixels(&copyRect, stride, size, (BYTE*)data.Data.data()))) return false;
 
 	return true;
 }
