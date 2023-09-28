@@ -54,10 +54,10 @@ void DXContext::SignalAndWait()
 	m_cmdQueue->Signal(m_fence, ++m_fenceValue);
 
 	if (FAILED(m_fence->SetEventOnCompletion(m_fenceValue, m_fenceEvent))) 
-		std::exit(-1);
+		exit(-1);
 
 	if ((WaitForSingleObject(m_fenceEvent, 20000) != WAIT_OBJECT_0))
-		std::exit(-2);
+		exit(-2);
 }
 
 ID3D12GraphicsCommandList7* DXContext::InitCommandList()

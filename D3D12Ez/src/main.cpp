@@ -78,20 +78,21 @@ int main(int argc, char* argv[])
 
 	struct Vertex
 	{
-		float x;
-		float y;
+		float x, y;
+		float u, v;
 	};
 
 	Vertex vertices[] =
 	{
-		{-1.0f, -1.0f},
-		{0.0f, 1.0f},
-		{1.0f, -1.0f}
+		{-1.0f, -1.0f, 0.0f, 1.0f},
+		{0.0f, 1.0f,   0.5f, 0.0f},
+		{1.0f, -1.0f,  1.0f, 1.f}
 	};
 
 	D3D12_INPUT_ELEMENT_DESC vertexLayout[] =
 	{
-		{ "Position", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 } // 2 dimensional array (vertex (x, y))
+		{ "Position", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "TexCoord", 0, DXGI_FORMAT_R32G32_FLOAT, 0, sizeof(float) * 2, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 	};
 
 	// ====== TEXTURE DATA ======
@@ -173,6 +174,32 @@ int main(int argc, char* argv[])
 		D3D12_HEAP_FLAG_NONE, &textureResourceDesc, D3D12_RESOURCE_STATE_COMMON, nullptr,
 		IID_PPV_ARGS(&texture)
 	);
+
+	// ====== DESCRIPTOR HEAP FOR TEXTURE(S)
+	D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc;
+	{
+		descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+		descriptorHeapDesc.NumDescriptors = 8;
+		descriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+		descriptorHeapDesc.NodeMask = 0;
+	}
+
+	ComPointer<ID3D12DescriptorHeap> shaderResourceViewHeap;
+	DXContext::Get().GetDevice()->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&shaderResourceViewHeap));
+
+	// ====== CREATE SHADER RESOURCE VIEWS
+	D3D12_SHADER_RESOURCE_VIEW_DESC shaderResrouceViewDesc;
+	{
+		shaderResrouceViewDesc.Format = textureData.GiPixelFormat;
+		shaderResrouceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+		shaderResrouceViewDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		shaderResrouceViewDesc.Texture2D.MipLevels = 1;
+		shaderResrouceViewDesc.Texture2D.MostDetailedMip = 0;
+		shaderResrouceViewDesc.Texture2D.PlaneSlice = 0;
+		shaderResrouceViewDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+	}
+	DXContext::Get().GetDevice()->CreateShaderResourceView(texture, &shaderResrouceViewDesc, shaderResourceViewHeap->GetCPUDescriptorHandleForHeapStart());
+
 	
 	// ====== COPY CPU resource to GPU resource
 	D3D12_BOX textureSizeAsBox;
@@ -357,6 +384,7 @@ int main(int argc, char* argv[])
 		// PSO
 		commandList->SetPipelineState(pipelineStateObject);
 		commandList->SetGraphicsRootSignature(rootSignature);
+		commandList->SetDescriptorHeaps(1, &shaderResourceViewHeap);
 
 		// IA (input assembler)
 		commandList->IASetVertexBuffers(0, 1, &vbv);
@@ -367,8 +395,8 @@ int main(int argc, char* argv[])
 		{
 			viewport.TopLeftX = 0;
 			viewport.TopLeftY = 0;
-			viewport.Width = DXWindow::Get().GetWidth();
-			viewport.Height = DXWindow::Get().GetHeight();
+			viewport.Width = (FLOAT)DXWindow::Get().GetWidth();
+			viewport.Height = (FLOAT)DXWindow::Get().GetHeight();
 			viewport.MinDepth = 1.0f;
 			viewport.MaxDepth = 0.0f;
 		}
@@ -386,6 +414,7 @@ int main(int argc, char* argv[])
 		static float color[] = {1, 0, 1};
 		pukeColor(color);
 		commandList->SetGraphicsRoot32BitConstants(0, 3, color, 0);
+		commandList->SetGraphicsRootDescriptorTable(1, shaderResourceViewHeap->GetGPUDescriptorHandleForHeapStart());
 
 		// draw
 		commandList->DrawInstanced(_countof(vertices), 1, 0, 0);

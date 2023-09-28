@@ -185,8 +185,11 @@ void DXWindow::SetFullscreen(bool enabled)
 	}
 	else 
 	{
+#pragma warning( push )
+#pragma warning( disable : 4244 ) // disable "double to int, possible loss of data"
 		m_width /= 1.5;
 		m_height /= 1.5;
+#pragma warning( pop ) 
 		CenterWindow();
 	}
 }
