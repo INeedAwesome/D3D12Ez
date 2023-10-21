@@ -7,10 +7,12 @@ project "D3D12Ez"
 --   pchheader "stdafx.h"
 --   pchsource "../%{prj.name}/src/stdafx.cpp"
 
-   files { "src/**.h", "src/**.cpp" }
+   files { "src/**.h", "src/**.cpp", "src/**.hlsli", "src/**.hlsl" }
    
-   targetdir ("$(SolutionDir)bin\\" .. outputdir .. "-%{prj.name}")
-   objdir ("$(SolutionDir)bin-int\\" .. outputdir .. "-%{prj.name}")
+   targetdir ("../bin/" .. outputdir .. "-%{prj.name}")
+   objdir ("../bin-int/" .. outputdir .. "-%{prj.name}")
+
+   debugdir "../"
    
    includedirs
    {
