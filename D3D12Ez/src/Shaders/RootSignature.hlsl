@@ -1,7 +1,8 @@
 /*
 	Root Signature layout CPU
 	 - 0		float3 "Color"
-	 - 1		descriptor table for "Textures"
+	 - 1		Correction "Correction Data"
+	 - 2		descriptor table for "Textures"
 
 
 	Root Signature layout GPU
@@ -13,7 +14,8 @@
 
 #define ROOTSIG \
 "RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT)," \
-"RootConstants(num32BitConstants=3, b0)," \
+"RootConstants(num32BitConstants=4, b0)," \
+"RootConstants(num32BitConstants=4, b1)," \
 "DescriptorTable(" \
 	"SRV(t0, numDescriptors = unbounded)" \
 ")," \

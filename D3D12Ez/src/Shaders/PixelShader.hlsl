@@ -14,6 +14,6 @@ void main(
 )
 {
 	float4 texel = textures[0].Sample(textureSampler, uv);
-	pixel = float4(texel.rgb, 1.0f);
+    pixel = float4(texel.rgb + color.rgb/2, 1.0f);
 	
 }

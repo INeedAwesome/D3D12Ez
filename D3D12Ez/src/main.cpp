@@ -35,7 +35,7 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
 int main(int argc, char* argv[])
 #endif //EZ_DIST
 {
-	Timer init("DirectX & Window Init");
+	Timer init("Window Init");
 
 	std::cout << "Hello World!" << std::endl;
 	DXDebugLayer::Get().Init();
@@ -413,8 +413,28 @@ int main(int argc, char* argv[])
 		// Root arguments
 		static float color[] = {1, 0, 1};
 		pukeColor(color);
+
+		static float angle = 0.0f;
+		angle += 0.005f;
+
+		struct Correction 
+		{
+			float AspectRatio;
+			float Zoom;
+			float SinAngle;
+			float CosAngle;
+		};
+		Correction correction
+		{
+			.AspectRatio = (float)DXWindow::Get().GetHeight() / (float)DXWindow::Get().GetWidth(),
+			.Zoom = 0.8f,
+			.SinAngle = sinf(angle),
+			.CosAngle = cosf(angle)
+		};
+
 		commandList->SetGraphicsRoot32BitConstants(0, 3, color, 0);
-		commandList->SetGraphicsRootDescriptorTable(1, shaderResourceViewHeap->GetGPUDescriptorHandleForHeapStart());
+		commandList->SetGraphicsRoot32BitConstants(1, 4, &correction, 0);
+		commandList->SetGraphicsRootDescriptorTable(2, shaderResourceViewHeap->GetGPUDescriptorHandleForHeapStart());
 
 		// draw
 		commandList->DrawInstanced(_countof(vertices), 1, 0, 0);
