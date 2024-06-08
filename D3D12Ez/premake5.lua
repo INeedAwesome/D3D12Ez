@@ -15,6 +15,16 @@ project "D3D12Ez"
    
    targetdir ("../bin/" .. outputdir .. "-%{prj.name}")
    objdir ("../bin-int/" .. outputdir .. "-%{prj.name}")
+
+--   pchheader "stdafx.h"
+--   pchsource "../%{prj.name}/src/stdafx.cpp"
+
+   files { "src/**.h", "src/**.cpp", "src/**.hlsli", "src/**.hlsl" }
+   
+   targetdir ("../bin/" .. outputdir .. "-%{prj.name}")
+   objdir ("../bin-int/" .. outputdir .. "-%{prj.name}")
+
+   debugdir "../"
    
    includedirs
    {
