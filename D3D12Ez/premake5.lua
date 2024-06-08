@@ -3,14 +3,18 @@ project "D3D12Ez"
    language "C++"
    cppdialect "C++20"
    staticruntime "off"
-
---   pchheader "stdafx.h"
---   pchsource "../%{prj.name}/src/stdafx.cpp"
-
-   files { "src/**.h", "src/**.cpp" }
+   systemversion "latest"
+  
+   files 
+   { 
+      "src/**.h", 
+      "src/**.cpp", 
+      "src/**.hlsli", 
+      "src/**.hlsl" 
+   }
    
-   targetdir ("$(SolutionDir)bin\\" .. outputdir .. "-%{prj.name}")
-   objdir ("$(SolutionDir)bin-int\\" .. outputdir .. "-%{prj.name}")
+   targetdir ("../bin/" .. outputdir .. "-%{prj.name}")
+   objdir ("../bin-int/" .. outputdir .. "-%{prj.name}")
    
    includedirs
    {
@@ -23,10 +27,8 @@ project "D3D12Ez"
       "dxgi.lib", 
       "dxguid.lib"
    }
-
-   filter "system:windows"
-      systemversion "latest"
-      defines { "EZ_PLATFORM_WINDOWS" }
+   
+   defines { "EZ_PLATFORM_WINDOWS" }
 
    filter "configurations:Debug"
       defines { "EZ_DEBUG" }

@@ -10,7 +10,6 @@
 #include "D3D/DXContext.h"
 #include "Debug/Timer.h"
 
-
 void pukeColor(float* color)
 {
 	static int pukeState = 0;
@@ -35,7 +34,7 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
 int main(int argc, char* argv[])
 #endif //EZ_DIST
 {
-	Timer init("Window Init");
+	Timer dxContextInit("DirectX Context Init");
 
 	std::cout << "Hello World!" << std::endl;
 	DXDebugLayer::Get().Init();
@@ -43,12 +42,14 @@ int main(int argc, char* argv[])
 	if (!DXContext::Get().Init())
 		return 1;
 
+	dxContextInit.StopAndPrintTime();
+	Timer windowInit("Window Creation");
+
 	if (!DXWindow::Get().Init())
 		return 2;
 
 	DXWindow::Get().SetFullscreen(true);
-
-	init.StopAndPrintTime();
+	windowInit.StopAndPrintTime();
 
 	Timer dxInit("DirectX Pipeline Init");
 
@@ -237,7 +238,7 @@ int main(int argc, char* argv[])
 	DXContext::Get().ExecuteCommandList();
 
 	// ====== SHADERS ======
-
+	
 	Shader rootSignatureShader("RootSignature.cso");
 	Shader vertexShader("VertexShader.cso");
 	Shader pixelShader("PixelShader.cso");
@@ -432,7 +433,7 @@ int main(int argc, char* argv[])
 			.CosAngle = cosf(angle)
 		};
 
-		commandList->SetGraphicsRoot32BitConstants(0, 3, color, 0);
+		commandList->SetGraphicsRoot32BitConstants(0, 4, color, 0);
 		commandList->SetGraphicsRoot32BitConstants(1, 4, &correction, 0);
 		commandList->SetGraphicsRootDescriptorTable(2, shaderResourceViewHeap->GetGPUDescriptorHandleForHeapStart());
 
